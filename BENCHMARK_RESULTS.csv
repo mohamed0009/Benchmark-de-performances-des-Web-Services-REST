@@ -1,0 +1,27 @@
+Service,Avg_ms,Min_ms,Max_ms,P95_ms,Rank,Performance_vs_Jersey,Use_Case
+Jersey (JAX-RS),20.1,14,76,27,1,Baseline (100%),"High performance, Low latency, Microservices"
+Spring MVC,31.24,19,138,49,2,55% slower,"Enterprise apps, Balanced approach, Complex business logic"
+Spring Data REST,80.9,47,189,136,3,302% slower,"Rapid prototyping, HATEOAS, Internal APIs"
+
+Test Configuration
+Parameter,Value
+Number of Requests,50 per service
+Endpoint,GET /api/categories?page=0&size=10
+Database,PostgreSQL 14
+Categories,2000
+Items,100000
+Connection Pool,HikariCP (min=10 max=20)
+JVM,OpenJDK 17 (temurin-alpine)
+Cache,Disabled (2nd level + query)
+Container,Docker Compose
+Monitoring,Prometheus + Grafana
+
+Architecture
+Component,Technology,Port,URL
+Jersey,JAX-RS 2.41 + Jetty 9 + Hibernate 5.6.15,8080,http://localhost:8080/api
+Spring MVC,Spring Boot 2.7.18 + Spring MVC,8083,http://localhost:8083/api
+Spring Data REST,Spring Boot 2.7.18 + Spring Data REST,8082,http://localhost:8082/api
+Database,PostgreSQL 14,5432,localhost:5432
+Prometheus,Latest,9091,http://localhost:9091
+Grafana,Latest,3001,http://localhost:3001
+InfluxDB,2.7-alpine,8086,http://localhost:8086

@@ -1,0 +1,254 @@
+{
+    "dashboard": {
+        "title": "JVM Metrics - REST Services Benchmark",
+        "tags": [
+            "jvm",
+            "benchmark",
+            "prof-lachgar"
+        ],
+        "timezone": "browser",
+        "schemaVersion": 16,
+        "version": 0,
+        "refresh": "5s",
+        "panels": [
+            {
+                "id": 1,
+                "title": "Heap Memory Usage",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "targets": [
+                    {
+                        "expr": "jvm_memory_heap_used{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Used",
+                        "refId": "A"
+                    },
+                    {
+                        "expr": "jvm_memory_heap_max{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Max",
+                        "refId": "B"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "bytes",
+                        "label": "Memory"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "title": "CPU Usage",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 0
+                },
+                "targets": [
+                    {
+                        "expr": "jvm_ProcessCpuLoad{job=~\"jersey|springmvc|springdata\"} * 100",
+                        "legendFormat": "{{service}} - CPU %",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "percent",
+                        "label": "CPU",
+                        "max": 100,
+                        "min": 0
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "title": "GC Collection Count",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 8
+                },
+                "targets": [
+                    {
+                        "expr": "rate(jvm_gc_collection_count{job=~\"jersey|springmvc|springdata\"}[1m])",
+                        "legendFormat": "{{service}} - {{gc}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "short",
+                        "label": "Collections/sec"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 4,
+                "title": "GC Collection Time",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 8
+                },
+                "targets": [
+                    {
+                        "expr": "rate(jvm_gc_collection_time_ms{job=~\"jersey|springmvc|springdata\"}[1m])",
+                        "legendFormat": "{{service}} - {{gc}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ms",
+                        "label": "Time"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 5,
+                "title": "Thread Count",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 16
+                },
+                "targets": [
+                    {
+                        "expr": "jvm_threads_ThreadCount{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Total",
+                        "refId": "A"
+                    },
+                    {
+                        "expr": "jvm_threads_DaemonThreadCount{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Daemon",
+                        "refId": "B"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "short",
+                        "label": "Threads"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 6,
+                "title": "HikariCP Connection Pool",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 16
+                },
+                "targets": [
+                    {
+                        "expr": "hikaricp_ActiveConnections{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Active",
+                        "refId": "A"
+                    },
+                    {
+                        "expr": "hikaricp_IdleConnections{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Idle",
+                        "refId": "B"
+                    },
+                    {
+                        "expr": "hikaricp_ThreadsAwaitingConnection{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Waiting",
+                        "refId": "C"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "short",
+                        "label": "Connections"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 7,
+                "title": "Non-Heap Memory",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 24
+                },
+                "targets": [
+                    {
+                        "expr": "jvm_memory_nonheap_used{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Used",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "bytes",
+                        "label": "Memory"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 8,
+                "title": "Classes Loaded",
+                "type": "graph",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 24
+                },
+                "targets": [
+                    {
+                        "expr": "jvm_classes_LoadedClassCount{job=~\"jersey|springmvc|springdata\"}",
+                        "legendFormat": "{{service}} - Loaded",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "short",
+                        "label": "Classes"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            }
+        ]
+    }
+}

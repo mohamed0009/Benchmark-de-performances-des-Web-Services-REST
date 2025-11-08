@@ -1,0 +1,15 @@
+{
+    "sku": "SKU_TEST_${__RandomString(10,0123456789,)}",
+    "name": "Test Item ${__RandomString(30,abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ,)}",
+    "price": ${__Random(10,
+        500)
+    }.99,
+    "stock": ${__Random(10,
+        1000)
+    },
+    "category": {
+        "id": ${__Random(1,
+            2000)
+        }
+    }
+}

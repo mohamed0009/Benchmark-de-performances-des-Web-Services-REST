@@ -1,0 +1,25 @@
+{
+    "sku": "SKU_LARGE_${__RandomString(10,0123456789,)}",
+    "name": "Large Test Item with extended description: ${__RandomString(500,abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,)}",
+    "price": ${__Random(100,
+        9999)
+    }.99,
+    "stock": ${__Random(1,
+        10000)
+    },
+    "category": {
+        "id": ${__Random(1,
+            2000)
+        }
+    },
+    "metadata": {
+        "supplier": "Supplier ${__RandomString(20,ABCDEFGHIJKLMNOPQRSTUVWXYZ,)}",
+        "warehouse": "WH-${__Random(1,100)}",
+        "tags": [
+            "tag1_${__RandomString(10,abcdefghijklmnopqrstuvwxyz,)}",
+            "tag2_${__RandomString(10,abcdefghijklmnopqrstuvwxyz,)}",
+            "tag3_${__RandomString(10,abcdefghijklmnopqrstuvwxyz,)}"
+        ],
+        "notes": "${__RandomString(1000,abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,)}"
+    }
+}

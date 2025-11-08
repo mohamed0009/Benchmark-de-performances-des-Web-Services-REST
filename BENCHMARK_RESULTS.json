@@ -1,0 +1,154 @@
+{
+    "benchmark": {
+        "title": "REST API Performance Comparison",
+        "date": "2025-11-06",
+        "version": "1.0",
+        "description": "Comparative performance analysis of Jersey, Spring MVC, and Spring Data REST"
+    },
+    "test_configuration": {
+        "requests_per_service": 50,
+        "endpoint": "GET /api/categories",
+        "parameters": {
+            "page": 0,
+            "size": 10
+        },
+        "database": {
+            "type": "PostgreSQL",
+            "version": "14",
+            "categories": 2000,
+            "items": 100000
+        },
+        "infrastructure": {
+            "jvm": "OpenJDK 17 (temurin-alpine)",
+            "connection_pool": {
+                "type": "HikariCP",
+                "min": 10,
+                "max": 20
+            },
+            "cache": {
+                "second_level": false,
+                "query": false
+            },
+            "container": "Docker Compose"
+        }
+    },
+    "results": [
+        {
+            "service": "Jersey",
+            "framework": "JAX-RS 2.41 + Jetty 9 + Hibernate 5.6.15",
+            "port": 8080,
+            "url": "http://localhost:8080/api",
+            "metrics": {
+                "avg_ms": 20.1,
+                "min_ms": 14,
+                "max_ms": 76,
+                "p95_ms": 27
+            },
+            "rank": 1,
+            "performance_vs_baseline": "100%",
+            "strengths": [
+                "Best raw performance",
+                "Minimal latency",
+                "Full control over endpoints",
+                "Lightweight framework"
+            ],
+            "weaknesses": [
+                "More boilerplate code",
+                "Manual Hibernate configuration",
+                "No integrated HikariCP"
+            ],
+            "use_cases": [
+                "High performance applications",
+                "Low latency requirements",
+                "Lightweight microservices",
+                "Custom API needs"
+            ]
+        },
+        {
+            "service": "Spring MVC",
+            "framework": "Spring Boot 2.7.18 + Spring MVC",
+            "port": 8083,
+            "url": "http://localhost:8083/api",
+            "metrics": {
+                "avg_ms": 31.24,
+                "min_ms": 19,
+                "max_ms": 138,
+                "p95_ms": 49
+            },
+            "rank": 2,
+            "performance_vs_baseline": "55% slower",
+            "strengths": [
+                "Good performance/productivity balance",
+                "Integrated HikariCP",
+                "Full control over business logic",
+                "Complete Spring ecosystem"
+            ],
+            "weaknesses": [
+                "Spring Framework overhead",
+                "55% slower than Jersey"
+            ],
+            "use_cases": [
+                "Enterprise applications",
+                "Need fine control over endpoints",
+                "Balance between productivity and performance",
+                "Complex business logic"
+            ]
+        },
+        {
+            "service": "Spring Data REST",
+            "framework": "Spring Boot 2.7.18 + Spring Data REST",
+            "port": 8082,
+            "url": "http://localhost:8082/api",
+            "metrics": {
+                "avg_ms": 80.9,
+                "min_ms": 47,
+                "max_ms": 189,
+                "p95_ms": 136
+            },
+            "rank": 3,
+            "performance_vs_baseline": "302% slower",
+            "strengths": [
+                "Ultra-fast development",
+                "Automatic HATEOAS endpoints",
+                "HAL JSON support",
+                "Out-of-the-box pagination/sorting"
+            ],
+            "weaknesses": [
+                "Lowest performance",
+                "HAL JSON overhead",
+                "Less control over endpoints",
+                "302% slower than Jersey"
+            ],
+            "use_cases": [
+                "Rapid prototyping",
+                "Internal APIs",
+                "Projects where productivity > performance",
+                "HATEOAS/HAL requirements"
+            ]
+        }
+    ],
+    "analysis": {
+        "winner": "Jersey",
+        "performance_gap": {
+            "jersey_vs_spring_mvc": "55% faster",
+            "jersey_vs_spring_data": "302% faster",
+            "spring_mvc_vs_spring_data": "159% faster"
+        },
+        "recommendations": {
+            "performance_critical": "Jersey",
+            "balanced_approach": "Spring MVC",
+            "rapid_development": "Spring Data REST"
+        }
+    },
+    "monitoring": {
+        "prometheus": "http://localhost:9091",
+        "grafana": "http://localhost:3001",
+        "influxdb": "http://localhost:8086"
+    },
+    "optimizations_applied": [
+        "Hibernate cache disabled (2nd level + query)",
+        "JOIN FETCH with separate countQuery",
+        "@JsonIgnore to avoid LazyInitializationException",
+        "HikariCP connection pooling (Spring services)"
+    ]
+}

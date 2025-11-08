@@ -1,0 +1,4 @@
+{
+    "code": "CAT_TEST_${__RandomString(8,abcdefghijklmnopqrstuvwxyz0123456789,)}",
+    "name": "Test Category ${__RandomString(20,abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ,)}"
+}

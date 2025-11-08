@@ -1,0 +1,152 @@
+services:
+  # PostgreSQL Database (shared by all services)
+  postgres:
+    image: postgres:14-alpine
+    container_name: benchmark-postgres
+    environment:
+      POSTGRES_DB: benchmark_db
+      POSTGRES_USER: benchmark_user
+      POSTGRES_PASSWORD: benchmark_pass
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - benchmark_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U benchmark_user -d benchmark_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service A: JAX-RS (Jersey) + JPA/Hibernate
+  service-jersey:
+    build:
+      context: ./services/service-jersey
+      dockerfile: Dockerfile
+    container_name: benchmark-jersey
+    ports:
+      - "8084:8080"
+      - "9090:9090"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: benchmark_db
+      DB_USER: benchmark_user
+      DB_PASSWORD: benchmark_pass
+      USE_JOIN_FETCH: "false"
+      JAVA_OPTIONS: "-javaagent:/opt/jmx_prometheus_javaagent.jar=9090:/opt/jmx-exporter-config.yaml"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - benchmark_network
+
+  # Service C: Spring Boot + @RestController + JPA/Hibernate
+  service-springmvc:
+    build:
+      context: ./services/service-springmvc
+      dockerfile: Dockerfile
+    container_name: benchmark-springmvc
+    ports:
+      - "8083:8081"
+      - "8091:8091"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/benchmark_db
+      SPRING_DATASOURCE_USERNAME: benchmark_user
+      SPRING_DATASOURCE_PASSWORD: benchmark_pass
+      USE_JOIN_FETCH: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - benchmark_network
+
+  # Service D: Spring Boot + Spring Data REST
+  service-springdata:
+    build:
+      context: ./services/service-springdata
+      dockerfile: Dockerfile
+    container_name: benchmark-springdata
+    ports:
+      - "8082:8082"
+      - "8092:8092"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/benchmark_db
+      SPRING_DATASOURCE_USERNAME: benchmark_user
+      SPRING_DATASOURCE_PASSWORD: benchmark_pass
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - benchmark_network
+
+  # Prometheus - Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: benchmark-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - benchmark_network
+    depends_on:
+      - service-jersey
+      - service-springmvc
+      - service-springdata
+
+  # Grafana - Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: benchmark-grafana
+    ports:
+      - "3001:3000" # Mapped to host 3001 to avoid conflict
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./configs/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - benchmark_network
+    depends_on:
+      - prometheus
+      - influxdb
+
+  # InfluxDB v2 - JMeter Backend Listener
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: benchmark-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: adminadmin
+      DOCKER_INFLUXDB_INIT_ORG: benchmark
+      DOCKER_INFLUXDB_INIT_BUCKET: jmeter
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: benchmark-secret-token
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    networks:
+      - benchmark_network
+
+networks:
+  benchmark_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+  influxdb_data:
+  influxdb_config:

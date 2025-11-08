@@ -1,0 +1,122 @@
+# Benchmark Configuration
+# YAML-based configuration for benchmarks
+
+benchmark:
+  # Test duration and load
+  duration: 300  # seconds
+  concurrent_users: 100
+  ramp_up_time: 30  # seconds
+  requests_per_test: 1000
+  
+  # Timeout settings
+  request_timeout: 30  # seconds
+  
+# Services to benchmark
+services:
+  - name: "Jersey (JAX-RS)"
+    url: http://localhost:8080
+    enabled: true
+    description: "JAX-RS (Jersey) + JPA/Hibernate"
+    
+  - name: "Spring MVC"
+    url: http://localhost:8091
+    enabled: true
+    description: "Spring Boot + @RestController + JPA/Hibernate"
+    
+  - name: "Spring Data REST"
+    url: http://localhost:8082
+    enabled: true
+    description: "Spring Boot + Spring Data REST (auto-exposed repositories)"
+
+# Test scenarios to run
+scenarios:
+  - type: throughput
+    enabled: true
+    config:
+      requests_per_level: 1000
+      user_levels: [1, 10, 50, 100, 200]
+  
+  - type: latency
+    enabled: true
+    config:
+      requests_per_endpoint: 500
+      endpoints:
+        - /api/ping
+        - /api/items
+        - /api/health
+  
+  - type: stress
+    enabled: false
+    config:
+      start_users: 10
+      max_users: 500
+      step: 50
+      requests_per_step: 500
+  
+  - type: endurance
+    enabled: false
+    config:
+      duration_seconds: 300
+      concurrent_users: 50
+  
+  - type: spike
+    enabled: false
+    config:
+      baseline_users: 10
+      spike_users: 200
+      baseline_duration: 60
+      spike_duration: 120
+  
+  - type: crud
+    enabled: true
+    config:
+      operations_per_type: 200
+      endpoints:
+        base: /api/items
+
+# Metrics collection
+metrics:
+  collect_system_metrics: true
+  sampling_interval: 1  # seconds
+  track_process_metrics: true
+
+# Output configuration
+output:
+  # Report formats to generate
+  formats: 
+    - html
+    - json
+    - csv
+  
+  # Output directory
+  directory: results/
+  
+  # Filename pattern (supports: {service}, {scenario}, {timestamp})
+  filename_pattern: "{service}_{scenario}_{timestamp}"
+  
+  # Charts and visualizations
+  generate_charts: true
+  chart_types:
+    - response_time_distribution
+    - throughput_comparison
+    - error_rate
+    - resource_usage
+
+# Advanced options
+advanced:
+  # Retry configuration
+  retry_enabled: true
+  retry_count: 3
+  retry_backoff: 0.3
+  
+  # Connection pooling
+  connection_pool_size: 100
+  max_connections: 100
+  
+  # Logging
+  log_level: INFO
+  log_file: benchmark.log
+  
+  # Performance
+  async_mode: false
+  parallel_services: true

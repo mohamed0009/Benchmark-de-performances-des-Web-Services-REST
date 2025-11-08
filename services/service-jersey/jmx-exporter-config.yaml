@@ -1,0 +1,51 @@
+---
+# JMX Exporter Configuration for Jersey Service
+# Metrics: JVM (CPU, Heap, GC, Threads, HikariCP)
+
+# Note: When using as javaagent, do NOT specify hostPort
+# Port is specified in the javaagent parameter: -javaagent:...jar=9090:config.yaml
+
+rules:
+  # JVM Memory metrics
+  - pattern: 'java.lang<type=Memory><HeapMemoryUsage>(\w+)'
+    name: jvm_memory_heap_$1
+    type: GAUGE
+    
+  - pattern: 'java.lang<type=Memory><NonHeapMemoryUsage>(\w+)'
+    name: jvm_memory_nonheap_$1
+    type: GAUGE
+
+  # JVM Garbage Collection metrics
+  - pattern: 'java.lang<type=GarbageCollector, name=(.+)><>CollectionCount'
+    name: jvm_gc_collection_count
+    labels:
+      gc: $1
+    type: COUNTER
+
+  - pattern: 'java.lang<type=GarbageCollector, name=(.+)><>CollectionTime'
+    name: jvm_gc_collection_time_ms
+    labels:
+      gc: $1
+    type: COUNTER
+
+  # JVM Thread metrics
+  - pattern: 'java.lang<type=Threading><>(ThreadCount|PeakThreadCount|DaemonThreadCount)'
+    name: jvm_threads_$1
+    type: GAUGE
+
+  # HikariCP Connection Pool metrics
+  - pattern: 'com.zaxxer.hikari<type=Pool, name=(.+)><>(ActiveConnections|IdleConnections|TotalConnections|ThreadsAwaitingConnection)'
+    name: hikaricp_$2
+    labels:
+      pool: $1
+    type: GAUGE
+
+  # CPU metrics
+  - pattern: 'java.lang<type=OperatingSystem><>(ProcessCpuLoad|SystemCpuLoad)'
+    name: jvm_$1
+    type: GAUGE
+
+  # Class loading
+  - pattern: 'java.lang<type=ClassLoading><>(LoadedClassCount|UnloadedClassCount)'
+    name: jvm_classes_$1
+    type: GAUGE

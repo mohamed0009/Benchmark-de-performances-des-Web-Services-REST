@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'benchmark-monitor'
+
+scrape_configs:
+  # Jersey Service (JMX Exporter)
+  - job_name: 'jersey'
+    static_configs:
+      - targets: ['service-jersey:9090']
+        labels:
+          service: 'jersey'
+          
+  # Spring MVC (Actuator)
+  - job_name: 'springmvc'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['service-springmvc:8091']
+        labels:
+          service: 'springmvc'
+          
+  # Spring Data REST (Actuator)
+  - job_name: 'springdata'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['service-springdata:8092']
+        labels:
+          service: 'springdata'
