@@ -52,4 +52,7 @@ out/
 *.synctex.gz
 *.fdb_latexmk
 *.fls
-*.pdf
+
+# Allow final report PDF
+!rapport.pdf
+!RAPPORT_*.pdf
